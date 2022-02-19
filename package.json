@@ -1,0 +1,15 @@
+{
+  "name": "wordlecheat",
+  "description": "Wordle cheat",
+  "version": "1.0.0",
+  "author": "greggzigler",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "cheat": "node index.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "prompt-sync": "4.2.0"
+  }
+}
