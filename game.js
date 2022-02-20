@@ -4,7 +4,21 @@
 const { GREEN, YELLOW, BLACK } = require('./constants');
 
 class Game {
-  constructor(wordLength, rawList) {
+  constructor(dateOverride, wordLength, rawList) {
+    // default to today's date
+    this.today = new Date(Date.now());
+    if (dateOverride) {
+      // convert string to date using local timezone
+      this.today = new Date(dateOverride.split('-'));
+      if (this.today.toString() === 'Invalid Date') {
+        throw `invalid date override ${dateOverride}`;
+      }
+      this.today.setTime(
+        this.today.getTime() + (this.today.getTimezoneOffset() * 60 * 1000)
+      );
+    }
+
+    // make sure raw list is not empty
     if (!rawList || rawList.length === 0) {
       throw 'empty raw list';
     }
@@ -19,10 +33,8 @@ class Game {
     }
   
     // sort raw list based on weight of letter-positions
-    this.wordList = rawList;
-    this.wordLength = wordLength;
-    const letterCount = this.countLetters();
-    const weightedObjects = this.weighWords(letterCount);
+    const letterCount = Game.countLetters(wordLength, rawList);
+    const weightedObjects = Game.weighWords(letterCount, rawList);
     this.wordList = Game.sortWords(weightedObjects);
   }
 
@@ -34,7 +46,7 @@ class Game {
   getGuess(attempt) {
     // use day-of-month for first guess (for variety)
     // otherwise use first word in filtered word list
-    const dateOffset = (new Date(Date.now())).getDate() - 1;
+    const dateOffset = this.today.getDate() - 1;
     const listIndex = dateOffset < this.wordList.length ? dateOffset : 0;
     const guessIndex = (attempt > 1) ? 0 : listIndex;
     return [ this.wordList[guessIndex], this.wordList.length ];
@@ -90,12 +102,12 @@ class Game {
     this.wordList = filteredList;
   }
 
-  countLetters() {
+  static countLetters(wordLength, rawList) {
     // letter weights from full word list should be used each turn
     const letterCount = [];
     const anyPos = Game.getAnyPosIndex();
-    this.wordList.forEach((word) => {
-      if (word.length !== this.wordLength) {
+    rawList.forEach((word) => {
+      if (word.length !== wordLength) {
         throw `invalid word length ${word.length} for word ${word}`;
       }
 
@@ -113,10 +125,10 @@ class Game {
     return letterCount;
   }
 
-  weighWords(weights) {
+  static weighWords(weights, rawList) {
     const weightedObjects = [];
     const anyPos = Game.getAnyPosIndex();
-    this.wordList.forEach(word => {
+    rawList.forEach(word => {
       // weigh based on unique letters in word
       let weight = 0;
       const letters = [...new Set(word.split(''))];

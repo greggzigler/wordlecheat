@@ -2,7 +2,7 @@
 
 Command line tool that uses the Wordle app word list to provide good guesses for the game
 
-## Installation
+## Setup
 
 Install node.js, get repository from GitHub, `cd` to repository directory, and run `npm install`.
 

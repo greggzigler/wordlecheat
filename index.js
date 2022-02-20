@@ -4,7 +4,9 @@ const prompt = require('prompt-sync')();
 const Game = require('./game.js');
 
 // game parameters
-const { LANG, WORDLEN, MAXATTS, SHOWHELP } = require('./constants.js');
+const {
+  WORDSET, WORDLEN, MAXATTS, SHOWHELP, TODAY
+} = require('./constants.js');
 
 // wordle response category
 const { GREEN } = require('./constants.js');
@@ -16,9 +18,9 @@ function main() {
   displayInstructions();
 
   const rawList = fs.readFileSync(
-    `./wordlists/${LANG}.${WORDLEN}.txt`, { encoding: 'utf8' }
+    `./wordlists/${WORDSET}.${WORDLEN}.txt`, { encoding: 'utf8' }
   ).split('\n');
-  const game = new Game(WORDLEN, rawList);
+  const game = new Game(TODAY, WORDLEN, rawList);
   
   // prompt user for next guess until max attempts have been made
   for (let attempt = 1; attempt <= MAXATTS; attempt += 1) {
