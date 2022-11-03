@@ -58,8 +58,13 @@ class Game {
     for (let i = 0; i < response.length; i += 1) {
       const letter = guess[i];
       const color = response[i].toUpperCase();
+      if (![BLACK, YELLOW, GREEN].includes(color)) {
+        console.log('unknown response color:', response[i]);
+        process.exit();
+      }
+
       if (color === BLACK) {
-        this.badLetters.add(letter);
+        this.wrongPosition[i].add(letter);
       } else if (color === YELLOW) {
         this.requiredLetters.add(letter);
         this.wrongPosition[i].add(letter);
@@ -68,9 +73,27 @@ class Game {
         const exactChars = this.exactPosition.split('');
         exactChars[i] = letter;
         this.exactPosition = exactChars.join('');
-      } else {
-        console.log('unknown response color:', response[i]);
-        process.exit();
+      }
+    }
+
+    // a black letter may also be a bad letter if not matched elsewhere
+    for (let i = 0; i < response.length; i += 1) {
+      const letter = guess[i];
+      const color = response[i].toUpperCase();
+      if (color === BLACK) {
+        let allBlack = true;
+        for (let j = 0; j < response.length; j += 1) {
+          if (i !== j && letter === guess[j]) {
+            let jColor = response[j].toUpperCase();
+            if (jColor !== BLACK) {
+              allBlack = false;
+              break;
+            }
+          }
+        }
+        if (allBlack) {
+          this.badLetters.add(letter);
+        }
       }
     }
   

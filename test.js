@@ -4,7 +4,7 @@ const Game = require('./game.js');
 // #######################################
 function testCtor(dateOverride, wordLength, rawList) {
   const game = new Game(dateOverride, wordLength, rawList);
-  const [ guess, count ] = game.getGuess(1);
+  const [ guess, count ] = game.getGuess(999);
   if (guess !== rawList[0]) throw `bad guess ${guess}`;
   if (count !== rawList.length) throw `bad count ${count}`;
   console.log('pass', rawList, wordLength);
@@ -15,7 +15,7 @@ testCtor(null, 2, ['on', 'no', 'oh']);
 // #######################################
 function testFilter(wordLength, rawList, response, expected) {
   const game = new Game(null, wordLength, rawList);
-  const [ guess, count ] = game.getGuess(1);
+  const [ guess, count ] = game.getGuess(999);
   game.applyFilter(guess, response);
   if (JSON.stringify(game.wordList) !== JSON.stringify(expected.wordList)) {
     throw `bad wordlist ${game.wordList}`;
@@ -80,6 +80,12 @@ testMultiTurn('2022-02-17', 'shake', {
   guesses: [ 'crane', 'slate', 'shade', 'shape', 'shame', 'shake' ],
   counts: [ 2315, 44, 7, 4, 3, 2 ],
   responses: [ 'BBGBG', 'GBGBG', 'GGGBG', 'GGGBG', 'GGGBG', 'GGGGG' ]
+});
+
+testMultiTurn('2022-02-12', 'ionic', {
+  guesses: [ 'later', 'noisy', 'conic', 'ionic' ],
+  counts: [ 2315, 196, 2, 1 ],
+  responses: [ 'BBBBB', 'YGYBB', 'BGGGG', 'GGGGG' ]
 });
 
 // #######################################
