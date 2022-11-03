@@ -5,7 +5,7 @@ const Game = require('./game.js');
 
 // game parameters
 const {
-  WORDSET, WORDLEN, MAXATTS, SHOWHELP, TODAY
+  WORDSET, WORDLEN, MAXATTS, SHOWHELP, TODAY, SHOWHINT
 } = require('./constants.js');
 
 // wordle response category
@@ -21,6 +21,7 @@ function main() {
     `./wordlists/${WORDSET}.${WORDLEN}.txt`, { encoding: 'utf8' }
   ).split('\n');
   const game = new Game(TODAY, WORDLEN, rawList);
+  displayHints(game.letterList);
   
   // prompt user for next guess until max attempts have been made
   for (let attempt = 1; attempt <= MAXATTS; attempt += 1) {
@@ -52,6 +53,17 @@ function displayInstructions() {
     console.log('1. Enter Guess letters onto Wordle website;');
     console.log('2. Enter Response colors onto command line; for example,');
     console.log('   enter BBGYG for black-black-green-yellow-green');
+    console.log('');
+  }
+}
+
+function displayHints(letterList) {
+  if (SHOWHINT) {
+    console.log('Hints: letters from most- to least-common:');
+    for (let index = 0; index < letterList.length; index++) {
+      const ranked = letterList[index].map(o => o.letter).join('');
+      console.log(index + ': ' + ranked);
+    }
     console.log('');
   }
 }

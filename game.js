@@ -34,6 +34,7 @@ class Game {
   
     // sort raw list based on weight of letter-positions
     const letterCount = Game.countLetters(wordLength, rawList);
+    this.letterList = Game.sortLetters(letterCount);
     const weightedObjects = Game.weighWords(letterCount, rawList);
     this.wordList = Game.sortWords(weightedObjects);
   }
@@ -142,6 +143,20 @@ class Game {
       weightedObjects.push({ word, weight });
     });
     return weightedObjects;
+  }
+
+  static sortLetters(letterCount) {
+    const sortedLetters = [];
+    letterCount.forEach((letterObject, index) => {
+      const positionCount = [];
+      Object.keys(letterObject).forEach(
+        letter => positionCount.push({ letter, count: letterObject[letter] })
+      );
+      sortedLetters[index] = positionCount.sort((a, b) => {
+        return b.count - a.count;
+      });
+    });
+    return sortedLetters;
   }
 
   static sortWords(weightedObjects) {
