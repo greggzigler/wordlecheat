@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "WordleCheat",
+  "description": "Solve Wordle with fewer guesses!",
+  "version": "0.1",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.nytimes.com/games/wordle/index.html"
+      ],
+      "js": ["/scripts/content.js"]
+    }
+  ],
+  "host_permissions": [
+    "https://www.nytimes.com/games/wordle/index.html"
+  ],
+  "icons": {
+    "16": "images/icon-16.png",
+    "32": "images/icon-32.png",
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  },
+  "permissions": [
+    "tabs"
+  ]
+}

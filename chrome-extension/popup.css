@@ -1,0 +1,37 @@
+html {
+  min-height: 5em;
+  min-width: 10em;
+  background: white;
+}
+
+body {
+  width: 20rem;
+}
+
+.goto-button {
+  padding: 5px 5px;
+  display: block;
+  width: 100px;
+  margin: 10px auto 0px auto;
+}​
+
+ul {
+  list-style-type: none;
+  padding-inline-start: 0;
+  margin: 1rem 0;
+}
+
+li {
+  padding: 0.25rem;
+}
+li:nth-child(odd) {
+  background: #80808030;
+}
+li:nth-child(even) {
+  background: #ffffff;
+}
+
+h3,
+p {
+  margin: 0;
+}

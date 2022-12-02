@@ -18,7 +18,7 @@ function main() {
   displayInstructions();
 
   const rawList = fs.readFileSync(
-    `./wordlists/${WORDSET}.${WORDLEN}.txt`, { encoding: 'utf8' }
+    `./dataWords/${WORDSET}.${WORDLEN}.txt`, { encoding: 'utf8' }
   ).split('\n');
   const game = new Game(TODAY, WORDLEN, rawList);
   displayHints(game.letterList);

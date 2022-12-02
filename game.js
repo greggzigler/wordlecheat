@@ -4,7 +4,7 @@
 const { GREEN, YELLOW, BLACK } = require('./constants');
 
 class Game {
-  constructor(dateOverride, wordLength, rawList) {
+  constructor(dateOverride, wordLength, rawList, weigher=Game.weighWords) {
     // default to today's date
     this.today = new Date(Date.now());
     if (dateOverride) {
@@ -23,19 +23,15 @@ class Game {
       throw 'empty raw list';
     }
 
-    // colors in responses are parsed into four state variables
-    this.badLetters = new Set();
-    this.requiredLetters = new Set();
-    this.exactPosition = '.'.repeat(wordLength);
-    this.wrongPosition = [];
-    for (let i = 0; i < wordLength; i += 1) {
-      this.wrongPosition.push(new Set());
-    }
+    this.wordLength = wordLength;
+    this.sortWordlist(wordLength, rawList, weigher);
+  }
   
-    // sort raw list based on weight of letter-positions
-    const letterCount = Game.countLetters(wordLength, rawList);
+  // sort raw list based on weight of letter-positions
+  sortWordlist(wordLength, wordList, weigher, attempt=0) {
+    const letterCount = Game.countLetters(wordLength, wordList);
     this.letterList = Game.sortLetters(letterCount);
-    const weightedObjects = Game.weighWords(letterCount, rawList);
+    const weightedObjects = weigher(letterCount, wordList, attempt);
     this.wordList = Game.sortWords(weightedObjects);
   }
 
@@ -53,8 +49,17 @@ class Game {
     return [ this.wordList[guessIndex], this.wordList.length ];
   }
 
-  // remove words from wordlist based on response colors
-  applyFilter(guess, response) {
+  // get regex for given guess and color-pattern response
+  getFilter(guess, response) {
+    // colors in responses are parsed into four variables
+    const badLetters = new Set();
+    const requiredLetters = new Set();
+    let exactPosition = '.'.repeat(this.wordLength);
+    const wrongPosition = [];
+    for (let i = 0; i < this.wordLength; i += 1) {
+      wrongPosition.push(new Set());
+    }
+
     for (let i = 0; i < response.length; i += 1) {
       const letter = guess[i];
       const color = response[i].toUpperCase();
@@ -64,15 +69,15 @@ class Game {
       }
 
       if (color === BLACK) {
-        this.wrongPosition[i].add(letter);
+        wrongPosition[i].add(letter);
       } else if (color === YELLOW) {
-        this.requiredLetters.add(letter);
-        this.wrongPosition[i].add(letter);
+        requiredLetters.add(letter);
+        wrongPosition[i].add(letter);
       } else if (color === GREEN) {
-        this.requiredLetters.add(letter);
-        const exactChars = this.exactPosition.split('');
+        requiredLetters.add(letter);
+        const exactChars = exactPosition.split('');
         exactChars[i] = letter;
-        this.exactPosition = exactChars.join('');
+        exactPosition = exactChars.join('');
       }
     }
 
@@ -92,7 +97,7 @@ class Game {
           }
         }
         if (allBlack) {
-          this.badLetters.add(letter);
+          badLetters.add(letter);
         }
       }
     }
@@ -100,20 +105,26 @@ class Game {
     // convert sets and patterns to regex objects
     // first insert (impossible) letter into bad array so that regex ctor works
     const BOGUS_LETTER = '#';
-    const badArray = Array.from(this.badLetters);
+    const badArray = Array.from(badLetters);
     badArray.push(BOGUS_LETTER);
   
     const regex = {
       bad: new RegExp(badArray.join('|')),
-      reqd: new RegExp(Array.from(this.requiredLetters)
+      reqd: new RegExp(Array.from(requiredLetters)
         .map(letter => `(?=.*${letter})`)
         .join('')),
-      exact: new RegExp(this.exactPosition),
-      wrong: new RegExp(this.wrongPosition
+      exact: new RegExp(exactPosition),
+      wrong: new RegExp(wrongPosition
         .map(set => `[^${Array.from(set).join('')}]`)
         .join(''))
     };
+    return regex;
+  }
   
+  // remove words from wordlist based on response colors
+  applyFilter(guess, response) {
+    const regex = this.getFilter(guess, response);
+
     // apply regexes to word list
     const filteredList = [];
     this.wordList.forEach((word) => {
@@ -126,11 +137,11 @@ class Game {
     this.wordList = filteredList;
   }
 
-  static countLetters(wordLength, rawList) {
+  static countLetters(wordLength, wordList) {
     // letter weights from full word list should be used each turn
     const letterCount = [];
     const anyPos = Game.getAnyPosIndex();
-    rawList.forEach((word) => {
+    wordList.forEach((word) => {
       if (word.length !== wordLength) {
         throw `invalid word length ${word.length} for word ${word}`;
       }
@@ -149,10 +160,10 @@ class Game {
     return letterCount;
   }
 
-  static weighWords(weights, rawList) {
+  static weighWords(letterCount, wordList, attempt=0) {
     const weightedObjects = [];
     const anyPos = Game.getAnyPosIndex();
-    rawList.forEach(word => {
+    wordList.forEach(word => {
       // weigh based on unique letters in word
       let weight = 0;
       const letters = [...new Set(word.split(''))];
@@ -160,8 +171,8 @@ class Game {
         // 1. start with frequency of any-position matching
         // 2. give extra weight to exact-position matching
         const exactPos = Game.getExactPosIndex(index);
-        weight += weights[anyPos][letter];
-        weight += weights[exactPos][letter];
+        weight += letterCount[anyPos][letter];
+        weight += letterCount[exactPos][letter];
       });
       weightedObjects.push({ word, weight });
     });
@@ -187,6 +198,37 @@ class Game {
       return b.weight - a.weight;
     }).map(obj => obj.word);
     return sortedWords;
+  }
+
+  // calculate B/Y/G response filter for given guess and solution
+  // not used in normal game, but useful for simulation
+  static calculateResponse(guessString, solutionString) {
+    const NO_LETTER = '#';
+    const SOLUTIONLEN = solutionString.length;
+    let guess = guessString.split('');
+    let solution = solutionString.split('');
+    let response = [];
+    for (let i = 0; i < SOLUTIONLEN; i += 1) {
+      if (guess[i] === solution[i]) {
+        response[i] = GREEN;
+        guess[i] = NO_LETTER;
+      }
+    }
+    for (let i = 0; i < SOLUTIONLEN; i += 1) {
+      for (let j = 0; j < SOLUTIONLEN; j += 1) {
+        if (i != j && guess[i] === solution[j]) {
+          response[i] = YELLOW;
+          guess[i] = NO_LETTER;
+        }
+      }
+    }
+    for (let i = 0; i < SOLUTIONLEN; i += 1) {
+      if (guess[i] != NO_LETTER) {
+        response[i] = BLACK;
+        guess[i] = NO_LETTER;
+      }
+    }
+    return response.join('');
   }
 }
 

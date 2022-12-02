@@ -37,7 +37,7 @@ testFilter(2, ['on', 'no', 'oh'], 'YY', {
 const wordSet = 'english';
 const wordLength = 5;
 const rawList = fs.readFileSync(
-  `./wordlists/${wordSet}.${wordLength}.txt`, { encoding: 'utf8' }
+  `./dataWords/${wordSet}.${wordLength}.txt`, { encoding: 'utf8' }
 ).split('\n');
 
 function testMultiTurn(dateOverride, solution, expected) {
