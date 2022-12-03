@@ -7,7 +7,7 @@
   "main": "index.js",
   "scripts": {
     "cheat": "node index.js",
-    "test": "node test.js"
+    "test": "node test/testGame.js"
   },
   "dependencies": {
     "prompt-sync": "^4.1.6"

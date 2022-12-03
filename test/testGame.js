@@ -1,5 +1,5 @@
 const fs = require('fs');
-const Game = require('./game.js');
+const Game = require('../game.js');
 
 // #######################################
 function testCtor(dateOverride, wordLength, rawList) {
@@ -37,7 +37,7 @@ testFilter(2, ['on', 'no', 'oh'], 'YY', {
 const wordSet = 'english';
 const wordLength = 5;
 const rawList = fs.readFileSync(
-  `./dataWords/${wordSet}.${wordLength}.txt`, { encoding: 'utf8' }
+  `./wordlists/${wordSet}.${wordLength}.txt`, { encoding: 'utf8' }
 ).split('\n');
 
 function testMultiTurn(dateOverride, solution, expected) {

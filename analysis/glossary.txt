@@ -1,0 +1,10 @@
+WORDLE HELP
+guess => entered 5-letter word
+opening word => first guess
+turn => submitting a guess
+solution => the correct answer
+solutions => possible answers
+
+WIKIPEDIA
+tries => turns
+marked => colored after a guess

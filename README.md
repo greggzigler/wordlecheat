@@ -1,19 +1,25 @@
 # wordlecheat
 
-Command line tool that uses the Wordle app word list to provide good guesses for the game
+Using the list of all possible Wordle solutions, this application helps you reduce the number of guesses to find today's solution. This application provides two user interfaces: a **command-line tool** and a **chrome extension**.
 
-## Setup
+## Command-line Tool
+
+### Tool Setup
 
 Install node.js, get repository from GitHub, `cd` to repository directory, and run `npm install`.
 
-## Usage
+### Tool Test
+
+`$ npm run test`
+
+### Tool Usage
 
 1. Open [Wordle](https://www.nytimes.com/games/wordle/index.html) in a browser.
 2. On the command line run `npm run cheat`.
 3. Enter the `Guess letters` onto the browser.
 4. Enter the first letters of the browser `Response Colors` onto the command line.
 
-### Example from February 19th, 2022
+#### Example from February 19th, 2022
 
 ```text
 $ npm run cheat
@@ -41,3 +47,11 @@ Wordle response: GBGGG
 Wordle guess: swill (2)
 Wordle response: GGGGG
 ```
+
+## Chrome Extension
+
+### Extension Setup
+
+### Extension Test
+
+### Extension Usage
