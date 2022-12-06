@@ -5,7 +5,7 @@ html {
 }
 
 body {
-  width: 20rem;
+  width: 10rem;
 }
 
 .goto-button {
@@ -17,21 +17,27 @@ body {
 
 ul {
   list-style-type: none;
-  padding-inline-start: 0;
-  margin: 1rem 0;
+  padding-left: 0;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 0;
+  margin-right: 1em;
 }
 
 li {
-  padding: 0.25rem;
-}
-li:nth-child(odd) {
-  background: #80808030;
-}
-li:nth-child(even) {
-  background: #ffffff;
+  padding: 1px 1px 3px 1px;
+  margin: 0;
 }
 
-h3,
-p {
+a {
+  padding: 0 6px 0 6px;
   margin: 0;
+  border:#ffffff 2px solid;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: large;
+  font-weight: bold;
+  color: #ffffff;
+  text-align: center;
+  width: 40px;
+  height: 40px;
 }

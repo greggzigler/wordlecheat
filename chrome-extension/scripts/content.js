@@ -9,6 +9,11 @@ const DATASTATE_TBD = "tbd";         // tile has letter, but guess not submitted
 const DATASTATE_ABSENT = "absent";   // letter is absent from solution (black)
 const DATASTATE_PRESENT = "present"; // letter is present but not in correct location (yellow)
 const DATASTATE_CORRECT = "correct"; // letter is in correct location (green)
+const COLORCODE_GREEN = "G";         // datastate is correct
+const COLORCODE_YELLOW = "Y";        // datastate is present
+const COLORCODE_BLACK = "B";         // datastate is absent
+const COLORCODE_WHITE = "W";         // datastate is tbd
+const COLORCODE_EMPTY = "X";         // datastate is empty
 
 function addSubTitle(text) {
   const elements = document.getElementsByClassName(CLASS_TITLE);
@@ -22,7 +27,18 @@ function addSubTitle(text) {
   title.appendChild(para);
 }
 
-function getTileProps(tileProp) {
+function dataStateToColorCode(dataState) {
+  switch (dataState) {
+    case DATASTATE_ABSENT: return COLORCODE_BLACK;
+    case DATASTATE_CORRECT: return COLORCODE_GREEN;
+    case DATASTATE_EMPTY: return COLORCODE_EMPTY;
+    case DATASTATE_PRESENT: return COLORCODE_YELLOW;
+    case DATASTATE_TBD: return COLORCODE_WHITE;
+    default: console.log(`bad ds: ${dataState}`); return null;
+  }
+}
+
+function getTileProps() {
   const tileProps = [];
   let elements = document.getElementsByClassName(CLASS_BOARD);
   const board = elements[0];
@@ -33,21 +49,27 @@ function getTileProps(tileProp) {
       const dataState = tile.getAttributeNode("data-state").value;
       if (dataState !== DATASTATE_EMPTY) {
         if (!tileProps[rindex]) tileProps[rindex] = [];
-        tileProps[rindex][tindex] = (tileProp === TILEPROP_LETTER)
-          ? tile.innerHTML
-          : dataState;
+        tileProps[rindex][tindex] = {
+          letter: tile.innerHTML,
+          color: dataStateToColorCode(dataState)
+        };
       }
     });
   });
   return tileProps;
 }
 
-function contentMain() {
-  const letters = getTileProps(TILEPROP_LETTER);
-  const dataStates = getTileProps(TILEPROP_DATASTATE);
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+};
+
+async function contentMain() {
   addSubTitle("I'm cheating!");
-  console.log(JSON.stringify(letters));
-  console.log(JSON.stringify(dataStates));
+  // TODO: instead of using timer, figure out which event to subscribe to
+  await sleep(2000);
+  const tileProps = getTileProps();
+  const response = await chrome.runtime.sendMessage(tileProps);
+  console.log(response.message);
 }
 
 contentMain();

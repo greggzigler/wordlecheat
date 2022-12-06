@@ -24,3 +24,13 @@ async function setBadge() {
 chrome.tabs.onActivated.addListener(setBadge);
 chrome.tabs.onCreated.addListener(setBadge);
 chrome.tabs.onUpdated.addListener(setBadge);
+
+chrome.runtime.onMessage.addListener(
+  function(tileProps, sender, sendResponse) {
+    chrome.storage.local.set({ tileProps: tileProps });
+    console.log(sender.tab ?
+                "from a content script: " + sender.tab.url :
+                "from the extension");
+    sendResponse({ message: tileProps.length ? "ack" : "ick" });
+  }
+);

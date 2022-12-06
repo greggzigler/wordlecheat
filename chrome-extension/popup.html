@@ -4,20 +4,31 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="popup.css" />
+    <link rel="stylesheet" href="./popup.css" />
+    <style>
+      ul {
+        list-style-type: none;
+        padding-left: 0;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        margin-left: 0;
+        margin-right: 1em;
+      }
+    </style>
   </head>
   <body>
-    <template id="li_template">
+    <script src="popup.js" type="module"></script>
+    <h1 id="title" style="font-family:Times, serif;">Wordle<em>Cheat</em></h1>
+
+    <template id="guess_template">
       <li>
-        <a>
-          <h3 class="title">Tab Title</h3>
-          <p class="pathname">Tab Pathname</p>
-        </a>
+        <a class="gclass"></a>
       </li>
     </template>
+    <template id="letter_template">
+      <a>?</a>
+    </template>
+    <ul></ul>
 
-    <h1 style="font-family:Times, serif;">Wordle<em>Cheat</em></h1>
-    <button type="submit" class="goto-button">Go To Wordle</button>
-    <script src="popup.js" type="module"></script>
   </body>
 </html>
