@@ -6,7 +6,13 @@ Using the list of all possible Wordle solutions, this application helps you redu
 
 ### Tool Setup
 
-Install node.js, get repository from GitHub, `cd` to repository directory, and run `npm install`.
+Install node.js, then:
+```
+$ git clone https://github.com/greggzigler/wordlecheat.git
+$ cd wordlecheat
+$ npm install
+$ npm run build
+```
 
 ### Tool Test
 
@@ -52,6 +58,22 @@ Wordle response: GGGGG
 
 ### Extension Setup
 
+Open the Chrome browser, then:
+
+1. open a tab at `chrome://extensions/`
+1. click the `Load unpacked` button
+1. select the `wordlecheat/chrome-extension` folder
+1. click the `Extensions` icon in the top right corner
+1. click the Pin icon by the `WordleCheat` entry
+1. click the `W` icon and see the popup dialog
+1. click the `Go To Wordle` button
+
+You should see the normal `Wordle` page, except now there's an `I'm cheating!` confession near the top.
+
 ### Extension Test
 
+No tests written yet
+
 ### Extension Usage
+
+Work-in-progress
