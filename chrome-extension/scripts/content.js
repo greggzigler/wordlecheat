@@ -2,8 +2,6 @@ const CLASS_TITLE = "AppHeader-module_title__6sqs-";
 const CLASS_BOARD = "Board-module_board__lbzlf";
 const CLASS_ROW = "Row-module_row__dEHfN";
 const CLASS_TILE = "Tile-module_tile__3ayIZ";
-const TILEPROP_LETTER = "innerText";
-const TILEPROP_DATASTATE = "data-state";
 const DATASTATE_EMPTY = "empty";     // tile is empty (no letter, white background)
 const DATASTATE_TBD = "tbd";         // tile has letter, but guess not submitted (white)
 const DATASTATE_ABSENT = "absent";   // letter is absent from solution (black)
@@ -65,11 +63,11 @@ const sleep = (milliseconds) => {
 
 async function contentMain() {
   addSubTitle("I'm cheating!");
-  // TODO: instead of using timer, figure out which event to subscribe to
+  // TODO: instead of using sleep, figure out which event to subscribe to
   await sleep(2000);
   const tileProps = getTileProps();
   const response = await chrome.runtime.sendMessage(tileProps);
-  console.log(response.message);
+  console.log('c72', response.message);
 }
 
 contentMain();

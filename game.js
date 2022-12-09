@@ -1,10 +1,6 @@
-// game state
-
-// wordle response categories
-const { GREEN, YELLOW, BLACK } = require('./constants');
 
 class Game {
-  constructor(dateOverride, wordLength, rawList, weigher=Game.weighWords) {
+  constructor(dateOverride, wordLength, rawList, weigher=Game.doNotSort) {
     // default to today's date
     this.today = new Date(Date.now());
     if (dateOverride) {
@@ -63,17 +59,18 @@ class Game {
     for (let i = 0; i < response.length; i += 1) {
       const letter = guess[i];
       const color = response[i].toUpperCase();
-      if (![BLACK, YELLOW, GREEN].includes(color)) {
+      const known = [ COLORCODE_BLACK, COLORCODE_YELLOW, COLORCODE_GREEN ];
+      if (!known.includes(color)) {
         console.log('unknown response color:', response[i]);
         process.exit();
       }
 
-      if (color === BLACK) {
+      if (color === COLORCODE_BLACK) {
         wrongPosition[i].add(letter);
-      } else if (color === YELLOW) {
+      } else if (color === COLORCODE_YELLOW) {
         requiredLetters.add(letter);
         wrongPosition[i].add(letter);
-      } else if (color === GREEN) {
+      } else if (color === COLORCODE_GREEN) {
         requiredLetters.add(letter);
         const exactChars = exactPosition.split('');
         exactChars[i] = letter;
@@ -85,12 +82,12 @@ class Game {
     for (let i = 0; i < response.length; i += 1) {
       const letter = guess[i];
       const color = response[i].toUpperCase();
-      if (color === BLACK) {
+      if (color === COLORCODE_BLACK) {
         let allBlack = true;
         for (let j = 0; j < response.length; j += 1) {
           if (i !== j && letter === guess[j]) {
             let jColor = response[j].toUpperCase();
-            if (jColor !== BLACK) {
+            if (jColor !== COLORCODE_BLACK) {
               allBlack = false;
               break;
             }
@@ -160,7 +157,13 @@ class Game {
     return letterCount;
   }
 
-  static weighWords(letterCount, wordList, attempt=0) {
+  static doNotSort(letterCount, wordList) {
+    return wordList.map((word, index) => {
+      return { word, weight: -1 * index };
+    });
+  }
+
+  static weighWords(letterCount, wordList) {
     const weightedObjects = [];
     const anyPos = Game.getAnyPosIndex();
     wordList.forEach(word => {
@@ -210,26 +213,24 @@ class Game {
     let response = [];
     for (let i = 0; i < SOLUTIONLEN; i += 1) {
       if (guess[i] === solution[i]) {
-        response[i] = GREEN;
+        response[i] = COLORCODE_GREEN;
         guess[i] = NO_LETTER;
       }
     }
     for (let i = 0; i < SOLUTIONLEN; i += 1) {
       for (let j = 0; j < SOLUTIONLEN; j += 1) {
         if (i != j && guess[i] === solution[j]) {
-          response[i] = YELLOW;
+          response[i] = COLORCODE_YELLOW;
           guess[i] = NO_LETTER;
         }
       }
     }
     for (let i = 0; i < SOLUTIONLEN; i += 1) {
       if (guess[i] != NO_LETTER) {
-        response[i] = BLACK;
+        response[i] = COLORCODE_BLACK;
         guess[i] = NO_LETTER;
       }
     }
     return response.join('');
   }
 }
-
-module.exports = Game;

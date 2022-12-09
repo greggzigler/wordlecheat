@@ -6,7 +6,8 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "cheat": "node index.js",
+    "build": "./build.sh",
+    "cheat": "node command-line/index.js",
     "test": "node test/testGame.js"
   },
   "dependencies": {

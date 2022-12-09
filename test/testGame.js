@@ -1,5 +1,5 @@
 const fs = require('fs');
-const Game = require('../game.js');
+const Game = require('../command-line/game.js');
 
 // #######################################
 function testCtor(dateOverride, wordLength, rawList) {

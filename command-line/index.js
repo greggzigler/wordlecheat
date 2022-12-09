@@ -9,7 +9,7 @@ const {
 } = require('./constants.js');
 
 // wordle response category
-const { GREEN } = require('./constants.js');
+const { COLORCODE_GREEN } = require('./constants.js');
 
 // execute program
 main();
@@ -20,7 +20,7 @@ function main() {
   const rawList = fs.readFileSync(
     `./wordlists/${WORDSET}.${WORDLEN}.txt`, { encoding: 'utf8' }
   ).split('\n');
-  const game = new Game(TODAY, WORDLEN, rawList);
+  const game = new Game(TODAY, WORDLEN, rawList, Game.weighWords);
   displayHints(game.letterList);
   
   // prompt user for next guess until max attempts have been made
@@ -36,7 +36,7 @@ function main() {
 
     // check for ctrl-C (null), exact match (all green), bad length
     if (response === null) break;
-    if (response.toUpperCase() === GREEN.repeat(WORDLEN)) break;
+    if (response.toUpperCase() === COLORCODE_GREEN.repeat(WORDLEN)) break;
     if (response.length !== WORDLEN) {
       console.log('invalid response length', response.length);
       break;
