@@ -41,7 +41,7 @@ const rawList = fs.readFileSync(
 ).split('\n');
 
 function testMultiTurn(dateOverride, solution, expected) {
-  const game = new Game(dateOverride, wordLength, rawList);
+  const game = new Game(dateOverride, wordLength, rawList, Game.weighWords);
   const attempts = expected.guesses.length;
   for (let attempt = 1; attempt < attempts + 1; attempt += 1) {
     const eGuess = expected.guesses[attempt - 1];

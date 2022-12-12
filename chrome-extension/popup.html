@@ -19,6 +19,15 @@
   <body>
     <script src="popup.js" type="module"></script>
     <h1 id="title">Wordle<em>Cheat</em></h1>
+    <div id="top_id"></div>
+    <ul class="ul_class wordle_only"></ul>
+    <div id="middle_id"></div>
+    <div class="table_anchor wordle_only">
+      <p class="count_class"></p>
+      <p class="subtitle_class"></p>
+      <table id="table_id"></table>
+    </div>
+    <div id="bottom_id"></div>
 
     <template id="guess_template">
       <li>
@@ -28,8 +37,6 @@
     <template id="letter_template">
       <a class="letter_class">?</a>
     </template>
-    <ul class="ul_class"></ul>
-
     <template id="tablerow_template">
       <tr class="tablerow_class">
         <td class="rowlabel_class">
@@ -40,11 +47,6 @@
         </td>
       </tr>
     </template>
-    <div class="table_anchor">
-      <p class="count_class"></p>
-      <p class="subtitle_class"></p>
-    </div>
-    <table></table>
 
   </body>
 </html>

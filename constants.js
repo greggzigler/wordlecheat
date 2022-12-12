@@ -18,6 +18,7 @@ const COLORTONE_WHITE = "#fff";
 const COLORTONE_GREEN = "#6aaa64";
 const COLORTONE_YELLOW = "#c9b458";
 const COLORTONE_BLACK = "#86888a";
+const TEXT_BADGE = "?";              // overlay W icon in red
 const WORDSET = 'english';           // set of words
 const WORDLEN = 5;                   // length of every word
 const MAXATTS = 6;                   // maximum attempts

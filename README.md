@@ -2,9 +2,7 @@
 
 Using the list of all possible Wordle solutions, this application helps you reduce the number of guesses to find today's solution. This application provides two user interfaces: a **command-line tool** and a **chrome extension**.
 
-## Command-line Tool
-
-### Tool Setup
+### General Setup
 
 Install node.js, then:
 ```
@@ -13,6 +11,12 @@ $ cd wordlecheat
 $ npm install
 $ npm run build
 ```
+
+## Command-line Tool
+
+### Tool Setup
+
+No extra setup required
 
 ### Tool Test
 

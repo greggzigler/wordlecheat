@@ -62,7 +62,7 @@ class Game {
       const known = [ COLORCODE_BLACK, COLORCODE_YELLOW, COLORCODE_GREEN ];
       if (!known.includes(color)) {
         console.log('unknown response color:', response[i]);
-        process.exit();
+        break;
       }
 
       if (color === COLORCODE_BLACK) {

@@ -41,14 +41,21 @@ async function currentTabIsWordle() {
   return !!tab;
 }
 
+async function getWordleTabId() {
+  const queryOptions = {
+    url: constants.WORDLE_URL
+  };
+  const [tab] = await chrome.tabs.query(queryOptions);
+  return tab ? tab.id : null;
+}
+
 async function setBadge() {
   const isWordle = await currentTabIsWordle();
   if (isWordle) {
-    chrome.action.setBadgeText({ text: "Cheat" });
-    chrome.action.setBadgeBackgroundColor({ color: "#FF0000" });
+    chrome.action.setBadgeText({ text: constants.TEXT_BADGE });
+    chrome.action.setBadgeBackgroundColor({ color: "#ffffff" });
   } else {
     chrome.action.setBadgeText({ text: "" });
-    chrome.action.setBadgeBackgroundColor({ color: "#000000" });
   }
 }
 
@@ -57,22 +64,33 @@ chrome.tabs.onCreated.addListener(setBadge);
 chrome.tabs.onUpdated.addListener(setBadge);
 
 chrome.runtime.onMessage.addListener(
-  async function(tileProps, sender, sendResponse) {
-    sendResponse({
-      message: `tiles:${tileProps.length}, tab:"${sender.tab.title}"`
-    });
-    // await chrome.storage.session.clear();
+  async function(message, sender, sendResponse) {
+    const { id } = message;
+    if (id === "sendingTilePropsFromContent") {
+      const { tileProps } = message;
+      sendResponse({
+        message: `tiles:${tileProps.length}, tabId:"${sender.tab.id}"`
+      });
+      let wordCount = -1;
+      const nextGuess = {};
+      Object.keys(constants.ALGORITHMS).forEach(algorithm => {
+        const wordList = getRemainingWordlist(algorithm, tileProps);
+        if (wordCount === -1) wordCount = wordList.length;
+        nextGuess[algorithm] = wordList[0];
+      });
+      await chrome.storage.session.set({ tileProps });
+      await chrome.storage.session.set({ wordCount });
+      await chrome.storage.session.set({ nextGuess });
+      console.log('b77', wordCount, JSON.stringify(nextGuess));
 
-    let wordCount = -1;
-    const nextGuess = {};
-    Object.keys(constants.ALGORITHMS).forEach(algorithm => {
-      const wordList = getRemainingWordlist(algorithm, tileProps);
-      if (wordCount === -1) wordCount = wordList.length;
-      nextGuess[algorithm] = wordList[0]; 
-    });
-    await chrome.storage.session.set({ tileProps });
-    await chrome.storage.session.set({ wordCount });
-    await chrome.storage.session.set({ nextGuess });
-    console.log('b75', wordCount, JSON.stringify(nextGuess));
+    } else if (id === "userPressedEnterInPopup") {
+      console.log('b79', 'received userPressedEnterInPopup message from', sender);
+      sendResponse({
+        message: "forward message to content.js"
+      });
+      const wordleTabId = await getWordleTabId();
+      const response = await chrome.tabs.sendMessage(wordleTabId, message);
+      console.log('b84', response);
+    }
   }
 );
