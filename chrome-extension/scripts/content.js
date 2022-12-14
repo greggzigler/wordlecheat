@@ -14,6 +14,7 @@ const COLORCODE_YELLOW = "Y";        // datastate is present
 const COLORCODE_BLACK = "B";         // datastate is absent (technically it is "gray")
 const COLORCODE_WHITE = "W";         // datastate is tbd
 const COLORCODE_EMPTY = "X";         // datastate is empty
+const WORDLEN = 5;                   // length of every word
 const MAXATTS = 6;                   // maximum attempts
 
 function updateSubTitle(text) {
@@ -45,22 +46,27 @@ function dataStateToColorCode(dataState) {
 
 function getTileProps() {
   const tileProps = [];
-  let elements = document.getElementsByClassName(CLASS_BOARD);
-  const board = elements[0];
-  const rows = board.querySelectorAll(`.${CLASS_ROW}`);
-  rows.forEach((row, rindex) => {
-    const tiles = row.querySelectorAll(`.${CLASS_TILE}`);
-    tiles.forEach((tile, tindex) => {
-      const dataState = tile.getAttributeNode("data-state").value;
-      if (dataState !== DATASTATE_EMPTY) {
-        if (!tileProps[rindex]) tileProps[rindex] = [];
-        tileProps[rindex][tindex] = {
-          letter: tile.innerHTML,
-          color: dataStateToColorCode(dataState)
-        };
-      }
-    });
+  let rindex = -1;
+  let tindex = -1;
+  const tiles = document.getElementsByClassName(CLASS_TILE);
+  Array.from(tiles).forEach((tile, i) => {
+    if (i % WORDLEN === 0) {
+      rindex += 1;
+      tindex = -1;
+    }
+    tindex += 1;
+    const dataState = tile.getAttributeNode("data-state").value;
+    const letter = tile.innerHTML;
+    console.log('c61', rindex, tindex, dataState, letter);
+    if (dataState !== DATASTATE_EMPTY) {
+      if (!tileProps[rindex]) tileProps[rindex] = [];
+      tileProps[rindex][tindex] = {
+        letter: tile.innerHTML,
+        color: dataStateToColorCode(dataState)
+      };
+    }
   });
+  console.log('c68', tileProps);
   return tileProps;
 }
 
@@ -72,9 +78,8 @@ async function sendTilePropsMessage() {
   await sleep(2000); // TODO: replace sleep with event subscription
   const tileProps = getTileProps();
   const message = { id: "sendingTilePropsFromContent", tileProps };
-  const response = await chrome.runtime.sendMessage(message);
-  console.log('c70', response ? response.message : 'none');
   await makeConfession();
+  await chrome.runtime.sendMessage(message);
 }
 
 async function listenForEnterClick() {
@@ -83,12 +88,14 @@ async function listenForEnterClick() {
   enterKey.addEventListener("click", () => sendTilePropsMessage());
 }
 
-function makeConfession() {
+async function makeConfession() {
   const tileProps = getTileProps();
   const rowCount = tileProps.length;
-  const isAllGreen = tileProps[rowCount - 1].reduce((acc, item) => {
-    return acc && (item.color === COLORCODE_GREEN);
-  }, true);
+  const isAllGreen = (rowCount === 0)
+    ? false
+    : tileProps[rowCount - 1].reduce((acc, item) => {
+      return acc && (item.color === COLORCODE_GREEN);
+    }, true);
   const isLastGuess = rowCount === MAXATTS;
   updateSubTitle((isAllGreen || isLastGuess)
     ? "I cheated!"
@@ -104,9 +111,39 @@ async function contentMain() {
 contentMain();
 
 chrome.runtime.onMessage.addListener(
-  async function(message, sender, sendResponse) {
-    console.log('c90', message);
-    sendResponse({ message: 'ack' });
-    updateSubTitle(message.id); // proof of concept
+  async function(message) {
+    const { id } = message;
+    if (id === "userClickedGuessInPopup") {
+      updateNextGuess(message.guessWord);
+    } else if (id === "userClickedEnterInPopup") {
+      await clickEnterKey();
+    }
   }
 );
+
+const keyboard = [
+  'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+  'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+  'enter', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'back'
+];
+
+function updateNextGuess(guessWord) {
+  console.log('c129', guessWord);
+  const elements = document.getElementsByClassName(CLASS_KEY);
+  const keyBack = elements[keyboard.indexOf('back')];
+  for (let i = 0; i < WORDLEN; i += 1) {
+    keyBack.click();
+  }
+  for (let i = 0; i < WORDLEN; i += 1) {
+    const letterKey = elements[keyboard.indexOf(guessWord[i])];
+    letterKey.click();
+  }
+}
+
+async function clickEnterKey() {
+  console.log('c142');
+  const elements = document.getElementsByClassName(CLASS_KEY);
+  const keyEnter = elements[keyboard.indexOf('enter')];
+  keyEnter.click();
+  await sendTilePropsMessage();
+}

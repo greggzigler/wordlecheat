@@ -11,12 +11,13 @@ async function currentTabIsWordle() {
 }
 
 async function activateWordleTab() {
-  const [tab] = await chrome.tabs.query({ url: constants.WORDLE_URL });
+  const url = constants.WORDLE_URL;
+  const [tab] = await chrome.tabs.query({ url });
   if (tab) {
     await chrome.tabs.reload(tab.id);
     await chrome.tabs.update(tab.id, { active: true, highlighted: true });
   } else {
-    await chrome.tabs.create({ active: true, url: constants.WORDLE_URL });
+    await chrome.tabs.create({ active: true, url });
   }
 }
 
@@ -34,19 +35,20 @@ function colorCodeToColorTone(colorCode) {
 async function addPreviousGuesses() {
   const result = await chrome.storage.session.get(["tileProps"]);
   if (!result || !result.tileProps) {
-    console.log('p37', 'did not get tileProps; hack by refreshing browser');
+    console.log('did not get tileProps; hack by refreshing browser');
     return { isAllGreen: undefined, previousGuessCount: undefined };
   }
 
-  let isAllGreen = true;
+  let isAllGreen = !!result.tileProps.length;
   const gTemplate = document.getElementById("guess_template");
   const lTemplate = document.getElementById("letter_template");
 
   const guessSet = new Set();
-  result.tileProps.forEach(row => {
+  result.tileProps.forEach((row, rindex) => {
     const letterSet = new Set();
     isAllGreen = true; // the last row is the only one that matters
-    row.forEach(tile => {
+    row.forEach((tile, tindex) => {
+      console.log('addPreviousGuesses', rindex, tindex, tile);
       if (tile.color !== constants.COLORCODE_GREEN) isAllGreen = false;
       const letterEl = lTemplate.content.firstElementChild.cloneNode(true);
       letterEl.textContent = tile.letter.toUpperCase();
@@ -76,13 +78,22 @@ async function addProposedGuesses() {
       document.querySelector(".count_class").textContent = countText;
       document.querySelector(".subtitle_class").textContent = 'Proposed Guesses';
     }
+    const guessWord = result.nextGuess[algorithm];
     const tElement = tTemplate.content.firstElementChild.cloneNode(true);
     const spanner = tElement.querySelector(".span_class");
     const button = tElement.querySelector(".button_class");
     spanner.textContent = algorithm;
     spanner.setAttribute("data-hover", descs[algorithm]);
-    button.textContent = result.nextGuess[algorithm];
-    console.log('p75', algorithm, result.nextGuess[algorithm]);
+    button.textContent = guessWord;
+    button.addEventListener("click", () => {
+      const message = {
+        id: "userClickedGuessInPopup",
+        algorithm,
+        guessWord
+      };
+      chrome.runtime.sendMessage(message);
+      console.log(`clicked button ${algorithm} ${guessWord}`);
+    });
     guessSet.add(tElement);
   }
   document.querySelector("table").append(...guessSet);
@@ -137,15 +148,20 @@ function addGotoButton() {
   addButton("Go To Wordle", activateWordleTab);
 }
 
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+};
+
 function addEnterButton() {
-  addButton("Enter", () => {
-    const message = { id: "userPressedEnterInPopup" };
+  addButton("Enter", async () => {
+    const message = { id: "userClickedEnterInPopup" };
     chrome.runtime.sendMessage(message);
+
+    // TODO: refresh popup
   });
 }
 
 async function popupMain() {
-  console.log('p107', Date.now());
   const isWordle = await currentTabIsWordle();
   if (isWordle) {
     const { isAllGreen, previousGuessCount } = await addPreviousGuesses();

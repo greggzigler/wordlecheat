@@ -14,7 +14,6 @@ function getFullWordlist(algorithm) {
     case 'shmoo': wordList = shmoo; break;
     default: wordList = ['error']; break;
   }
-  console.log('b18', algorithm, wordList[0]);
   return wordList;
 }
 
@@ -27,7 +26,6 @@ function getRemainingWordlist(algorithm, tileProps) {
     const response = row.map(tile => tile.color).join('');
     game.applyFilter(guess, response);
   });
-  console.log('b30', algorithm, game.wordList[0]);
   return game.wordList;
 }
 
@@ -66,13 +64,14 @@ chrome.tabs.onUpdated.addListener(setBadge);
 chrome.runtime.onMessage.addListener(
   async function(message, sender, sendResponse) {
     const { id } = message;
+    const wordleTabId = await getWordleTabId();
     if (id === "sendingTilePropsFromContent") {
-      const { tileProps } = message;
       sendResponse({
-        message: `tiles:${tileProps.length}, tabId:"${sender.tab.id}"`
+        message: 'b71 got sendingTilePropsFromContent message'
       });
       let wordCount = -1;
       const nextGuess = {};
+      const { tileProps } = message;
       Object.keys(constants.ALGORITHMS).forEach(algorithm => {
         const wordList = getRemainingWordlist(algorithm, tileProps);
         if (wordCount === -1) wordCount = wordList.length;
@@ -81,16 +80,17 @@ chrome.runtime.onMessage.addListener(
       await chrome.storage.session.set({ tileProps });
       await chrome.storage.session.set({ wordCount });
       await chrome.storage.session.set({ nextGuess });
-      console.log('b77', wordCount, JSON.stringify(nextGuess));
 
-    } else if (id === "userPressedEnterInPopup") {
-      console.log('b79', 'received userPressedEnterInPopup message from', sender);
+    } else if (id === "userClickedGuessInPopup") {
       sendResponse({
-        message: "forward message to content.js"
+        message: "forwarding message to content.js"
       });
-      const wordleTabId = await getWordleTabId();
-      const response = await chrome.tabs.sendMessage(wordleTabId, message);
-      console.log('b84', response);
+      await chrome.tabs.sendMessage(wordleTabId, message);
+    } else if (id === "userClickedEnterInPopup") {
+      sendResponse({
+        message: "forwarding message to content.js"
+      });
+      await chrome.tabs.sendMessage(wordleTabId, message);
     }
   }
 );

@@ -76,7 +76,7 @@ You should see the normal `Wordle` page, except now there's an `I'm cheating!` c
 
 ### Extension Test
 
-No tests written yet
+See [test README](./chrome-extension/test/README.md)
 
 ### Extension Usage
 
