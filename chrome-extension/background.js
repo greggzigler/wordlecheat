@@ -77,6 +77,7 @@ chrome.runtime.onMessage.addListener(
         if (wordCount === -1) wordCount = wordList.length;
         nextGuess[algorithm] = wordList[0];
       });
+      await chrome.storage.session.clear();
       await chrome.storage.session.set({ tileProps });
       await chrome.storage.session.set({ wordCount });
       await chrome.storage.session.set({ nextGuess });

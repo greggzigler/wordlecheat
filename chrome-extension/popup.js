@@ -100,9 +100,21 @@ async function addProposedGuesses() {
 }
 
 function removeWordleOnly() {
-  const wordleOnly = document.querySelectorAll(".wordle_only");
-  for (const node of wordleOnly) {
-    node.remove();
+  while (document.querySelectorAll(".wordle_only").length) {
+    document.querySelectorAll(".wordle_only")[0].remove();
+  }
+}
+
+async function clearWordleOnly() {
+  const buttons = document.getElementsByClassName("popup-button");
+  if (buttons.length) buttons[0].remove();
+
+  while (document.getElementsByClassName("tablerow_class").length) {
+    document.getElementsByClassName("tablerow_class")[0].remove();
+  }
+
+  while (document.getElementsByClassName("li_class").length) {
+    document.getElementsByClassName("li_class")[0].remove();
   }
 }
 
@@ -135,13 +147,13 @@ async function addConsolations() {
 
 function addButton(label, listener) {
   const bottom = document.getElementById("bottom_id");
-  const para = document.createElement("div");
-  const gotoButton = document.createElement("button");
-  gotoButton.addEventListener("click", listener);
-  gotoButton.setAttribute("class", "goto-button");
-  gotoButton.innerHTML = label;
-  para.appendChild(gotoButton);
-  bottom.appendChild(para);
+  const div = document.createElement("div");
+  const popupButton = document.createElement("button");
+  popupButton.addEventListener("click", listener);
+  popupButton.setAttribute("class", "popup-button");
+  popupButton.innerHTML = label;
+  div.appendChild(popupButton);
+  bottom.appendChild(div);
 }
 
 function addGotoButton() {
@@ -157,7 +169,10 @@ function addEnterButton() {
     const message = { id: "userClickedEnterInPopup" };
     chrome.runtime.sendMessage(message);
 
-    // TODO: refresh popup
+    await sleep(1000);  // TODO: replace sleep with event subscription
+    clearWordleOnly();
+    await sleep(3000);  // TODO: replace sleep with event subscription
+    await popupMain();
   });
 }
 

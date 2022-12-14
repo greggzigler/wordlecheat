@@ -103,7 +103,6 @@ async function makeConfession() {
 }
 
 async function contentMain() {
-  makeConfession();
   await sendTilePropsMessage();
   await listenForEnterClick();
 }
