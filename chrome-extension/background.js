@@ -1,20 +1,17 @@
 import constants from "/constants.js";
 import { Game } from "/game.js";
+
 import alpha from "/wordlists/alpha.js";
 import hefty from "/wordlists/hefty.js";
 import rando from "/wordlists/rando.js";
 import shmoo from "/wordlists/shmoo.js";
 
 function getFullWordlist(algorithm) {
-  let wordList = null;
-  switch(algorithm) {
-    case 'alpha': wordList = alpha; break;
-    case 'hefty': wordList = hefty; break;
-    case 'rando': wordList = rando; break;
-    case 'shmoo': wordList = shmoo; break;
-    default: wordList = ['error']; break;
-  }
-  return wordList;
+  if (algorithm === 'alpha') return alpha;
+  if (algorithm === 'hefty') return hefty;
+  if (algorithm === 'rando') return rando;
+  if (algorithm === 'shmoo') return shmoo;
+  return ['error'];
 }
 
 function getRemainingWordlist(algorithm, tileProps) {
@@ -75,7 +72,7 @@ chrome.runtime.onMessage.addListener(
       Object.keys(constants.ALGORITHMS).forEach(algorithm => {
         const wordList = getRemainingWordlist(algorithm, tileProps);
         if (wordCount === -1) wordCount = wordList.length;
-        nextGuess[algorithm] = wordList[0];
+        nextGuess[algorithm] = wordList.slice(0, constants.MAXGUESSES);
       });
       await chrome.storage.session.clear();
       await chrome.storage.session.set({ tileProps });

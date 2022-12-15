@@ -5,7 +5,7 @@ const Game = require('./game.js');
 
 // game parameters
 const {
-  WORDSET, WORDLEN, MAXATTS, SHOWHELP, TODAY, SHOWHINT
+  WORDSET, WORDLEN, MAXGUESSES, SHOWHELP, TODAY, SHOWHINT
 } = require('./constants.js');
 
 // wordle response category
@@ -24,7 +24,7 @@ function main() {
   displayHints(game.letterList);
   
   // prompt user for next guess until max attempts have been made
-  for (let attempt = 1; attempt <= MAXATTS; attempt += 1) {
+  for (let attempt = 1; attempt <= MAXGUESSES; attempt += 1) {
     const [ guess, count ] = game.getGuess(attempt);
     if (count === 0) {
       console.log('No matches in word list');

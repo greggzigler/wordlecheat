@@ -6,7 +6,7 @@ const fs = require('fs');
 const Game = require('./game.js');
 
 const {
-  WORDSET, WORDLEN, MAXATTS, GREEN, YELLOW, BLACK
+  WORDSET, WORDLEN, MAXGUESSES, GREEN, YELLOW, BLACK
 } = require('./constants.js');
 
 // ############################
@@ -62,7 +62,7 @@ function evaluate(weigher, offset) {
     game.sortWordlist(WORDLEN, rawList, weigher);
 
     // how fast can each first guess find the right solution?
-    for (let attempt = 1; attempt <= MAXATTS; attempt += 1) {
+    for (let attempt = 1; attempt <= MAXGUESSES; attempt += 1) {
       attempts += 1;
       // game.sortWordlist(WORDLEN, game.wordList, weigher, attempt);
 
@@ -77,7 +77,7 @@ function evaluate(weigher, offset) {
       game.applyFilter(guess, response);
 
       // keep track of whether this first word finds the right solution
-      if (attempt == MAXATTS) {
+      if (attempt == MAXGUESSES) {
         fails += 1;
       }
     }
@@ -152,7 +152,7 @@ function graduated(weights, rawList, attempt=0) {
     letters.forEach((letter, index) => {
       const exactPos = Game.getExactPosIndex(index);
       const fullWeight = weights[anyPos][letter] + weights[exactPos][letter];
-      const factor = already.has(letter) ? (attempt/MAXATTS) : 1;
+      const factor = already.has(letter) ? (attempt/MAXGUESSES) : 1;
       weight += Math.ceil(fullWeight * factor);
       already.add(letter);
     });

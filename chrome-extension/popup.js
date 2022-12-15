@@ -63,27 +63,51 @@ async function addPreviousGuesses() {
   return { isAllGreen, previousGuessCount: guessSet.size };
 }
 
-async function addProposedGuesses() {
-  const descs = constants.ALGORITHMS;
-  const guessSet = new Set();
-  const tTemplate = document.getElementById("tablerow_template");
-  const result = await chrome.storage.session.get(["wordCount", "nextGuess"]);
-  if (!result || !result.wordCount || !result.nextGuess) return;
+function getUniqueWords(nextGuess) {
+  const algDescs = constants.ALGORITHMS;
+  const algorithms = Object.keys(algDescs);
+  const algCount = algorithms.length;
+  const { MAXBUTTONS } = constants;
 
-  let firstAlgorithm = true;
-  for (const algorithm of Object.keys(descs)) {
-    if (firstAlgorithm) {
-      firstAlgorithm = false;
-      const countText = `Possible Solutions: ${result.wordCount}`;
-      document.querySelector(".count_class").textContent = countText;
-      document.querySelector(".subtitle_class").textContent = 'Proposed Guesses';
+  const uniqueWords = {};
+  for (let i = 0; ; i += 1) {
+    if (Object.keys(uniqueWords).length === MAXBUTTONS) break;
+    const algorithm = algorithms[i % algCount];
+    if (nextGuess[algorithm].length === 0) break;
+    const guessWord = nextGuess[algorithm].shift();
+    if (!uniqueWords[guessWord]) {
+      uniqueWords[guessWord] = algorithm;
     }
-    const guessWord = result.nextGuess[algorithm];
-    const tElement = tTemplate.content.firstElementChild.cloneNode(true);
-    const spanner = tElement.querySelector(".span_class");
-    const button = tElement.querySelector(".button_class");
-    spanner.textContent = algorithm;
-    spanner.setAttribute("data-hover", descs[algorithm]);
+  }
+  return uniqueWords;
+}
+
+async function addProposedGuesses() {
+  const trTemplate = document.getElementById("tablerow_template");
+  const rdTemplate = document.getElementById("rowdata_template");
+  const wcResult = await chrome.storage.session.get(["wordCount"]);
+  const ngResult = await chrome.storage.session.get(["nextGuess"]);
+  if (!wcResult || !wcResult.wordCount) return;
+  if (!ngResult || !ngResult.nextGuess) return;
+
+  const countText = `Possible Solutions: ${wcResult.wordCount}`;
+  document.querySelector(".count_class").textContent = countText;
+  document.querySelector(".subtitle_class").textContent = 'Proposed Guesses:';
+
+  const guessSet = new Set();
+  const uniqueWords = getUniqueWords(ngResult.nextGuess);
+  const totalWords = Object.keys(uniqueWords).length;
+  let tableRow = null;
+  for (let i = 0; i < totalWords && i < constants.MAXBUTTONS; i += 1) {
+    if (i % 2 === 0) {
+      tableRow = trTemplate.content.firstElementChild.cloneNode(true);
+    }
+    const guessWord = Object.keys(uniqueWords)[i];
+    const algorithm = uniqueWords[guessWord];
+
+    const rowData =rdTemplate.content.firstElementChild.cloneNode(true);
+    const buttons = rowData.getElementsByClassName("button_class");
+    const button = buttons[0];
     button.textContent = guessWord;
     button.addEventListener("click", () => {
       const message = {
@@ -94,7 +118,21 @@ async function addProposedGuesses() {
       chrome.runtime.sendMessage(message);
       console.log(`clicked button ${algorithm} ${guessWord}`);
     });
-    guessSet.add(tElement);
+
+    // each row can have up to 2 buttons
+    tableRow.appendChild(rowData);
+    if (i % 2 === 1) {
+      guessSet.add(tableRow);
+      tableRow = null;
+    }
+  }
+
+  // if odd number of words, last row has only one word, so center it
+  if (tableRow) {
+    const rowCells = tableRow.getElementsByClassName("rowdata_class");
+    const rowData = rowCells[0];
+    rowData.setAttribute("colspan", "2");
+    guessSet.add(tableRow);
   }
   document.querySelector("table").append(...guessSet);
 }
@@ -182,7 +220,7 @@ async function popupMain() {
     const { isAllGreen, previousGuessCount } = await addPreviousGuesses();
     if (isAllGreen) {
       await addCongratulations();
-    } else if (previousGuessCount === constants.MAXATTS) {
+    } else if (previousGuessCount === constants.MAXGUESSES) {
       await addConsolations();
     } else {
       await addProposedGuesses();

@@ -11,7 +11,7 @@ const { GREEN } = require('./constants');
 const FOLDER = './wordLists';
 const WORDSET = 'stdDev';
 const WORDLEN = 5;
-const MAXATTS = WORDLEN + 1;
+const MAXGUESSES = WORDLEN + 1;
 const MAXVALUE = 99999999;
 
 let bestEver = {
@@ -88,7 +88,7 @@ while (true) {
 
   // sort by fails-guesses, exit loop if it is worse
   const sorted = guessStats.sort((a, b) => {
-    const maxGuesses = wordCount * MAXATTS;
+    const maxGuesses = wordCount * MAXGUESSES;
     const aValue = (maxGuesses * a.fails) + a.guesses;
     const bValue = (maxGuesses * b.fails) + b.guesses;
     return aValue - bValue;
@@ -147,7 +147,7 @@ function findSolution(guessStats, firstGuess, solution) {
   let guesses = 0;
   const wordList = guessStats.map(tuple =>tuple.firstGuess);
   const game = new Game(null, WORDLEN, wordList, weigher);
-  for (let attempt = 1; attempt <= MAXATTS; attempt += 1) {
+  for (let attempt = 1; attempt <= MAXGUESSES; attempt += 1) {
     guesses += 1;
     const guess = (attempt == 1) ? firstGuess : game.wordList[0];
 
@@ -156,7 +156,7 @@ function findSolution(guessStats, firstGuess, solution) {
     if (response.toUpperCase() === GREEN.repeat(response.length)) break;
     game.applyFilter(guess, response);
 
-    if (attempt == MAXATTS) {
+    if (attempt == MAXGUESSES) {
       return -1;
     }
   }

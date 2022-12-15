@@ -21,14 +21,15 @@ const COLORTONE_BLACK = "#86888a";
 const TEXT_BADGE = "C";              // overlay W icon in red
 const WORDSET = 'english';           // set of words
 const WORDLEN = 5;                   // length of every word
-const MAXATTS = 6;                   // maximum attempts
+const MAXGUESSES = 6;                // maximum attempts
+const MAXBUTTONS = 8;                // potential guesses displayed
 const SHOWHELP = true;               // display help instructions
 const SHOWHINT = true;               // display hints for common letters
 const TODAY = null;                  // date override; format YYYY-MM-DD
-const ALGORITHMS = {
-  alpha: 'ordered alphabetically',
+const ALGORITHMS = {                 // keys ordered by personal preference
+  shmoo: 'ranked by standard deviation smoothness',
   hefty: 'weighted by letter frequency',
   rando: 'sorted randomly',
-  shmoo: 'ranked by standard deviation smoothness'
+  alpha: 'ordered alphabetically'
 };
   const X = 'indent this line, it is a hack for build.sh';

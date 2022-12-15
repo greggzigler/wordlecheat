@@ -15,7 +15,7 @@ const COLORCODE_BLACK = "B";         // datastate is absent (technically it is "
 const COLORCODE_WHITE = "W";         // datastate is tbd
 const COLORCODE_EMPTY = "X";         // datastate is empty
 const WORDLEN = 5;                   // length of every word
-const MAXATTS = 6;                   // maximum attempts
+const MAXGUESSES = 6;                // maximum attempts
 
 function updateSubTitle(text) {
   let subTitle = document.getElementById("confession");
@@ -104,7 +104,7 @@ async function makeConfession() {
     : tileProps[rowCount - 1].reduce((acc, item) => {
       return acc && (item.color === COLORCODE_GREEN);
     }, true);
-  const isLastGuess = rowCount === MAXATTS;
+  const isLastGuess = rowCount === MAXGUESSES;
   updateSubTitle((isAllGreen || isLastGuess)
     ? "I cheated!"
     : "I'm cheating!");
