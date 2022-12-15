@@ -80,4 +80,8 @@ See [test README](./chrome-extension/test/README.md)
 
 ### Extension Usage
 
-Work-in-progress
+1. click a button under `Proposed Guesses`
+1. click the `Enter` button
+1. repeat until game is solved
+
+![Screenshot](./images/ExtensionUsageExample.png)

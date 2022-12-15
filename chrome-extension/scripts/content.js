@@ -48,25 +48,33 @@ function getTileProps() {
   const tileProps = [];
   let rindex = -1;
   let tindex = -1;
+  let whiteCount = 0;
+  let row = [];
   const tiles = document.getElementsByClassName(CLASS_TILE);
   Array.from(tiles).forEach((tile, i) => {
     if (i % WORDLEN === 0) {
       rindex += 1;
       tindex = -1;
+      whiteCount = 0;
+      row = [];
     }
     tindex += 1;
     const dataState = tile.getAttributeNode("data-state").value;
     const letter = tile.innerHTML;
-    console.log('c61', rindex, tindex, dataState, letter);
-    if (dataState !== DATASTATE_EMPTY) {
-      if (!tileProps[rindex]) tileProps[rindex] = [];
-      tileProps[rindex][tindex] = {
+    if (dataState !== DATASTATE_TBD && dataState !== DATASTATE_EMPTY) {
+      row[tindex] = {
         letter: tile.innerHTML,
         color: dataStateToColorCode(dataState)
       };
+    } else {
+      whiteCount += 1;
+    }
+
+    if (tindex === WORDLEN - 1) {
+      if (whiteCount) return; // this row is not fully evaluated
+      tileProps[rindex] = row;
     }
   });
-  console.log('c68', tileProps);
   return tileProps;
 }
 
@@ -127,7 +135,6 @@ const keyboard = [
 ];
 
 function updateNextGuess(guessWord) {
-  console.log('c129', guessWord);
   const elements = document.getElementsByClassName(CLASS_KEY);
   const keyBack = elements[keyboard.indexOf('back')];
   for (let i = 0; i < WORDLEN; i += 1) {
@@ -140,7 +147,6 @@ function updateNextGuess(guessWord) {
 }
 
 async function clickEnterKey() {
-  console.log('c142');
   const elements = document.getElementsByClassName(CLASS_KEY);
   const keyEnter = elements[keyboard.indexOf('enter')];
   keyEnter.click();

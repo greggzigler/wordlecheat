@@ -51,7 +51,7 @@ async function setBadge() {
   const isWordle = await currentTabIsWordle();
   if (isWordle) {
     chrome.action.setBadgeText({ text: constants.TEXT_BADGE });
-    chrome.action.setBadgeBackgroundColor({ color: "#ffffff" });
+    chrome.action.setBadgeBackgroundColor({ color: "#ff0000" });
   } else {
     chrome.action.setBadgeText({ text: "" });
   }
