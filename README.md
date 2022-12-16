@@ -84,4 +84,6 @@ See [test README](./chrome-extension/test/README.md)
 1. click the `Enter` button
 1. repeat until game is solved
 
+
+#### Example from December 15th, 2022
 ![Screenshot](./images/ExtensionUsageExample.png)
