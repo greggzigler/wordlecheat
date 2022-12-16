@@ -72,7 +72,7 @@ function getUniqueWords(nextGuess) {
   const uniqueWords = {};
   for (let i = 0; ; i += 1) {
     if (Object.keys(uniqueWords).length === MAXBUTTONS) break;
-    const algorithm = algorithms[i % algCount];
+    const algorithm = algorithms[Math.trunc(i / 2) % algCount];
     if (nextGuess[algorithm].length === 0) break;
     const guessWord = nextGuess[algorithm].shift();
     if (!uniqueWords[guessWord]) {
