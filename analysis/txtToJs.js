@@ -1,6 +1,6 @@
 const fs = require('fs');
 const list = fs.readFileSync(
-  '../wordlists/unique.5.txt', { encoding: 'utf8' }
+  './dataEval/random2.txt', { encoding: 'utf8' }
 ).split('\n');
 
 const string = list.reduce((acc, item, index) => {

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const initialList = fs.readFileSync(
-  // './wordlists/english1.5.txt', { encoding: 'utf8' }
-  './stdDev.5.00000.txt', { encoding: 'utf8' }
+  '../wordlists/random.5.txt', { encoding: 'utf8' }
+  // './stdDev.5.00000.txt', { encoding: 'utf8' }
 ).split('\n');
 
 const guessStats = initialList.map((string) => {
