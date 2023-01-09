@@ -1,8 +1,8 @@
 const WORDLE_URL = "https://www.nytimes.com/games/wordle/index.html";
-const CLASS_TITLE = "AppHeader-module_title__6sqs-";
-const CLASS_BOARD = "Board-module_board__lbzlf";
-const CLASS_ROW = "Row-module_row__dEHfN";
-const CLASS_TILE = "Tile-module_tile__3ayIZ";
+const CLASS_TITLE = "AppHeader-module_title_";
+const CLASS_BOARD = "Board-module_board_";
+const CLASS_ROW = "Row-module_row_";
+const CLASS_TILE = "Tile-module_tile_";
 const DATASTATE_EMPTY = "empty";     // tile is empty (no letter; white background)
 const DATASTATE_TBD = "tbd";         // tile has letter; but guess not submitted (white)
 const DATASTATE_CORRECT = "correct"; // letter is in correct location (green)

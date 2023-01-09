@@ -4,3 +4,4 @@ chrome-extension/game.js
 command-line/game.js
 chrome-extension/constants.js
 command-line/constants.js
+.DS_Store

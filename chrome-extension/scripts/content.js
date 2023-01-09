@@ -1,8 +1,8 @@
-const CLASS_TITLE = "AppHeader-module_title__6sqs-";
-const CLASS_BOARD = "Board-module_board__lbzlf";
-const CLASS_ROW = "Row-module_row__dEHfN";
-const CLASS_TILE = "Tile-module_tile__3ayIZ";
-const CLASS_KEY = "Key-module_key__Rv-Vp";
+const CLASS_TITLE = "AppHeader-module_title_";
+const CLASS_BOARD = "Board-module_board_";
+const CLASS_ROW = "Row-module_row_";
+const CLASS_TILE = "Tile-module_tile_";
+const CLASS_KEY = "Key-module_key_";
 const KEYINDEX_ENTER = "19";         // wordle html does not have id for key
 const DATASTATE_EMPTY = "empty";     // tile is empty (no letter, white background)
 const DATASTATE_TBD = "tbd";         // tile has letter, but guess not submitted (white)
@@ -17,13 +17,24 @@ const COLORCODE_EMPTY = "X";         // datastate is empty
 const WORDLEN = 5;                   // length of every word
 const MAXGUESSES = 6;                // maximum attempts
 
+function getElementsByClassNamePrefix(tagName, prefix) {
+  const divs = document.getElementsByTagName(tagName);
+  const matches = [];
+  Array.from(divs).forEach((div, index) => {
+    if (div.className.startsWith(prefix)) {
+      matches.push(divs[index]);
+    }
+  });
+  return matches;
+}
+
 function updateSubTitle(text) {
   let subTitle = document.getElementById("confession");
   if (subTitle) {
     subTitle.innerHTML = text;
     subTitle.style.fontSize = "small";
   } else {
-    const elements = document.getElementsByClassName(CLASS_TITLE);
+    const elements = getElementsByClassNamePrefix('div', CLASS_TITLE);
     const title = elements[0];
     subTitle = document.createElement("div");
     subTitle.setAttribute("id", "confession");
@@ -50,7 +61,7 @@ function getTileProps() {
   let tindex = -1;
   let whiteCount = 0;
   let row = [];
-  const tiles = document.getElementsByClassName(CLASS_TILE);
+  const tiles = getElementsByClassNamePrefix('div', CLASS_TILE);
   Array.from(tiles).forEach((tile, i) => {
     if (i % WORDLEN === 0) {
       rindex += 1;
@@ -91,7 +102,7 @@ async function sendTilePropsMessage() {
 }
 
 async function listenForEnterClick() {
-  const elements = document.getElementsByClassName(CLASS_KEY);
+  const elements = getElementsByClassNamePrefix('button', CLASS_KEY);
   const enterKey = elements[KEYINDEX_ENTER];
   enterKey.addEventListener("click", () => sendTilePropsMessage());
 }
@@ -135,7 +146,7 @@ const keyboard = [
 ];
 
 function updateNextGuess(guessWord) {
-  const elements = document.getElementsByClassName(CLASS_KEY);
+  const elements = getElementsByClassNamePrefix('button', CLASS_KEY);
   const keyBack = elements[keyboard.indexOf('back')];
   for (let i = 0; i < WORDLEN; i += 1) {
     keyBack.click();
@@ -147,7 +158,7 @@ function updateNextGuess(guessWord) {
 }
 
 async function clickEnterKey() {
-  const elements = document.getElementsByClassName(CLASS_KEY);
+  const elements = getElementsByClassNamePrefix('button', CLASS_KEY);
   const keyEnter = elements[keyboard.indexOf('enter')];
   keyEnter.click();
   await sendTilePropsMessage();
